@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Climate Closet – Home</title>
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#22c55e;
+      --accent2:#60a5fa;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Roboto,Inter,Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{
+      max-width:920px;
+      margin:0 auto;
+      padding:0 16px 48px;
+    }
+    header{
+      border-bottom:1px solid rgba(148,163,184,.25);
+      background:#020617;
+    }
+    .nav{
+      max-width:920px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .nav-title{
+      font-weight:700;
+      font-size:18px;
+    }
+    .nav-links{
+      display:flex;
+      gap:10px;
+      font-size:14px;
+    }
+    .nav-links a{
+      padding:6px 10px;
+      border-radius:999px;
+      color:var(--muted);
+    }
+    .nav-links a.active{
+      background:rgba(96,165,250,.2);
+      color:#e5f0ff;
+    }
+    .hero{
+      padding:40px 0 24px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .hero h1{
+      margin:0;
+      font-size:32px;
+    }
+    .hero p{
+      margin:0;
+      max-width:600px;
+      color:var(--muted);
+      font-size:15px;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:var(--accent2);
+      border-radius:999px;
+      padding:10px 18px;
+      color:white;
+      font-weight:600;
+      font-size:14px;
+      border:none;
+      cursor:pointer;
+      margin-top:6px;
+    }
+    .card{
+      background:var(--panel);
+      border-radius:14px;
+      padding:16px 18px;
+      border:1px solid rgba(148,163,184,.3);
+      margin-top:10px;
+      font-size:14px;
+    }
+    .card h2{
+      margin:0 0 6px;
+      font-size:18px;
+    }
+    .hint{color:var(--muted);font-size:13px}
+  </style>
+</head>
+<body>
+<header>
+  <div class="nav">
+    <div class="nav-title">Climate Closet</div>
+    <nav class="nav-links">
+      <a href="index.html" class="active">Home</a>
+      <a href="planner.html">Outfit planner</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Weather-aware outfit recommendations</h1>
+    <p>
+      Climate Closet helps you translate real-time weather into practical outfit ideas.
+      Use your current location or any coordinates, see the forecast snapshot,
+      and get clothing suggestions tuned to the temperature and your context
+      (school, work, gym, date night, and more).
+    </p>
+    <a href="planner.html" class="btn">
+      Start planning today’s outfit →
+    </a>
+  </section>
+
+  <section class="card">
+    <h2>What you can do</h2>
+    <ul class="hint">
+      <li>Use browser geolocation or manual coordinates to fetch weather data.</li>
+      <li>See temperature, humidity, and wind in a compact dashboard.</li>
+      <li>Get simple outfit suggestions based on current conditions.</li>
+      <li>Later: connect to a Supabase wardrobe database and save favorite looks.</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
