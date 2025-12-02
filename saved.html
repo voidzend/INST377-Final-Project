@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Climate Closet – Saved Outfits</title>
+
+  <style>
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#22c55e;
+      --accent2:#60a5fa;
+      --danger:#ef4444;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Roboto,Inter,Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+    header{
+      border-bottom:1px solid rgba(148,163,184,.25);
+      background:#020617;
+    }
+    .nav{
+      max-width:920px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .nav-title{font-weight:700;font-size:18px;}
+    .nav-links{display:flex;gap:10px;font-size:14px;}
+    .nav-links a{
+      padding:6px 10px;
+      border-radius:999px;
+      color:var(--muted);
+      text-decoration:none;
+    }
+    .nav-links a.active{
+      background:rgba(96,165,250,.2);
+      color:#e5f0ff;
+    }
+    .wrap{
+      max-width:920px;
+      margin:0 auto;
+      padding:0 16px 48px;
+    }
+    h1{
+      margin-top:24px;
+      font-size:28px;
+    }
+    .card{
+      background:var(--panel);
+      border-radius:14px;
+      padding:16px 18px;
+      margin-top:16px;
+      border:1px solid rgba(148,163,184,.3);
+    }
+    .hint{color:var(--muted);font-size:13px;}
+    select{
+      background:#0b1220;
+      border:1px solid rgba(255,255,255,.25);
+      border-radius:10px;
+      color:var(--text);
+      padding:8px 10px;
+      font-size:14px;
+      min-width:140px;
+    }
+    .outfit-list{
+      margin-top:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .outfit-card{
+      background:rgba(15,23,42,.9);
+      border-radius:12px;
+      padding:10px 12px;
+      border:1px solid rgba(148,163,184,.4);
+      font-size:14px;
+    }
+    .outfit-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:4px;
+    }
+    .outfit-context{
+      font-size:13px;
+      color:var(--muted);
+      text-transform:capitalize;
+    }
+    .temp-pill{
+      font-size:13px;
+      padding:3px 8px;
+      border-radius:999px;
+      background:rgba(96,165,250,.18);
+      color:#bfdbfe;
+    }
+    .outfit-advice{
+      font-weight:600;
+      margin:4px 0;
+    }
+    .outfit-meta{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .danger-text{
+      color:var(--danger);
+      font-size:13px;
+      margin-top:8px;
+    }
+    .empty{
+      padding:12px;
+      border-radius:10px;
+      background:rgba(15,23,42,.8);
+      border:1px dashed rgba(148,163,184,.6);
+      font-size:14px;
+      color:var(--muted);
+      margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="nav">
+    <div class="nav-title">Climate Closet</div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="planner.html">Outfit planner</a>
+      <a href="saved.html" class="active">Saved outfits</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <h1>Saved Outfits</h1>
+  <p class="hint">
+    These outfits come from the <code>saved_outfits</code> table in Supabase, using
+    the <code>/api/saved-outfits</code> endpoint.
+  </p>
+
+  <section class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+      <div>
+        <h2 style="margin:0 0 4px;">Outfit history</h2>
+        <p class="hint" style="margin:0;">
+          Filter by context or view everything, newest first.
+        </p>
+      </div>
+      <div>
+        <label class="hint" for="contextFilter">Filter by context</label><br>
+        <select id="contextFilter">
+          <option value="">All contexts</option>
+          <option value="casual">Casual</option>
+          <option value="school">School</option>
+          <option value="work">Work</option>
+          <option value="date">Date</option>
+          <option value="gym">Gym</option>
+        </select>
+      </div>
+    </div>
+
+    <div id="listStatus" class="hint" style="margin-top:10px;"></div>
+
+    <div id="outfitList" class="outfit-list"></div>
+    <div id="emptyState" class="empty" style="display:none;">
+      No saved outfits yet. Use the planner page to save an outfit, then refresh this page.
+    </div>
+    <p id="errorMsg" class="danger-text" style="display:none;"></p>
+  </section>
+</main>
+
+<script>
+  const $ = s => document.querySelector(s);
+
+  async function fetchSavedOutfits(context){
+    const params = new URLSearchParams();
+    if(context){
+      params.set('context', context);
+    }
+    const url = params.toString()
+      ? `/api/saved-outfits?${params.toString()}`
+      : '/api/saved-outfits';
+
+    const res = await fetch(url, { cache:'no-store' });
+    if(!res.ok){
+      const text = await res.text().catch(()=> '');
+      throw new Error(`GET ${url} failed: ${res.status} ${res.statusText} ${text}`);
+    }
+    return res.json();
+  }
+
+  function renderList(data){
+    const list = $('#outfitList');
+    const empty = $('#emptyState');
+    const error = $('#errorMsg');
+    const status = $('#listStatus');
+
+    list.innerHTML = '';
+    error.style.display = 'none';
+    error.textContent = '';
+
+    if(!Array.isArray(data) || data.length === 0){
+      empty.style.display = '';
+      status.textContent = '0 outfits found.';
+      return;
+    }
+
+    empty.style.display = 'none';
+    status.textContent = `${data.length} outfit${data.length === 1 ? '' : 's'} found.`;
+
+    data.forEach(row => {
+      const card = document.createElement('div');
+      card.className = 'outfit-card';
+
+      const context = row.context || 'unknown';
+      const temp = typeof row.temp_f === 'number' ? `${row.temp_f}°F` : '—';
+      const place = row.place || 'Unknown location';
+      const advice = row.advice || '(no advice saved)';
+      const observed = row.observed_at
+        ? new Date(row.observed_at).toLocaleString()
+        : '(no timestamp)';
+
+      card.innerHTML = `
+        <div class="outfit-header">
+          <span class="outfit-context">${context}</span>
+          <span class="temp-pill">${temp}</span>
+        </div>
+        <div class="outfit-advice">${advice}</div>
+        <div class="outfit-meta">
+          ${place}<br>
+          <span class="hint">Observed at: ${observed}</span>
+        </div>
+      `;
+
+      list.appendChild(card);
+    });
+  }
+
+  async function loadAndRender(){
+    const error = $('#errorMsg');
+    const status = $('#listStatus');
+    status.textContent = 'Loading outfits…';
+    error.style.display = 'none';
+    error.textContent = '';
+
+    const context = $('#contextFilter').value || '';
+
+    try{
+      const data = await fetchSavedOutfits(context);
+      renderList(data);
+    }catch(e){
+      console.error(e);
+      status.textContent = '';
+      error.style.display = '';
+      error.textContent = 'Error loading outfits. Check console/logs.';
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadAndRender();
+
+    $('#contextFilter').addEventListener('change', () => {
+      loadAndRender();
+    });
+  });
+</script>
+
+</body>
+</html>
