@@ -3,7 +3,7 @@
 Written By Duran Keefe and Nde Mbah
 
 
-Title of your project: 
+Title of your project: Climate Closet
 # Climate Closet: Weather-Based Outfit Recommender
 
 Description of your project:
