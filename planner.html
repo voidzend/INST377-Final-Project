@@ -185,13 +185,18 @@
       background:rgba(148,163,184,.3);
       margin:14px 0;
     }
+    .outfit-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      margin-top:6px;
+    }
     .outfit-card{
       border-radius:10px;
       border:1px solid rgba(148,163,184,.4);
       padding:8px 10px;
       font-size:13px;
       background:rgba(15,23,42,.7);
-      margin:0 4px;
     }
     .outfit-card-main{
       font-weight:600;
@@ -201,21 +206,40 @@
       color:var(--danger);
       font-size:13px;
     }
-    /* basic slider controls */
-    .slider-controls{
-      display:flex;
-      justify-content:flex-end;
-      gap:8px;
-      margin-top:6px;
+    /* --- Weather image slider --- */
+    .weather-slider-wrapper{
+      margin-top:18px;
     }
-    .slider-btn{
-      background:transparent;
-      border:1px solid rgba(148,163,184,.6);
-      border-radius:999px;
+    .weather-slider{
+      position:relative;
+      width:100%;
+      max-height:220px;
+      overflow:hidden;
+      border-radius:14px;
+    }
+    .weather-slide{
+      position:relative;
+    }
+    .weather-slide img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      display:block;
+    }
+    .slider-caption{
+      position:absolute;
+      left:12px;
+      bottom:10px;
       padding:4px 10px;
+      border-radius:999px;
+      background:rgba(15,23,42,.7);
+      color:#e5e7eb;
       font-size:12px;
-      color:var(--muted);
-      cursor:pointer;
+    }
+    #tempChart{
+      width:100%;
+      max-height:180px;
+      margin-top:12px;
     }
     @media (max-width:600px){
       .kv{
@@ -224,11 +248,11 @@
       .big{
         font-size:26px;
       }
+      .weather-slide img{
+        height:180px;
+      }
     }
   </style>
-
-  <!-- Chart.js (JS library #1) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 <header>
@@ -243,10 +267,39 @@
 </header>
 
 <main class="wrap">
+  <!-- Weather photo slider using simple-slider -->
+  <section class="card">
+    <h2>Today’s weather vibe</h2>
+    <div class="weather-slider-wrapper">
+      <div id="weatherSlider" class="weather-slider">
+        <div class="weather-slide">
+          <img src="https://images.pexels.com/photos/281260/pexels-photo-281260.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Sunny day over city">
+          <div class="slider-caption">Warm &amp; sunny – think light layers</div>
+        </div>
+        <div class="weather-slide">
+          <img src="https://images.pexels.com/photos/7919/pexels-photo.jpg?auto=compress&cs=tinysrgb&w=1200" alt="Rainy street at night">
+          <div class="slider-caption">Rainy – waterproof shoes &amp; jacket</div>
+        </div>
+        <div class="weather-slide">
+          <img src="https://images.pexels.com/photos/814499/pexels-photo-814499.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Snowy trees">
+          <div class="slider-caption">Cold &amp; snowy – heavy coat &amp; boots</div>
+        </div>
+        <div class="weather-slide">
+          <img src="https://images.pexels.com/photos/210307/pexels-photo-210307.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Foggy city">
+          <div class="slider-caption">Cool &amp; foggy – cozy mid-layers</div>
+        </div>
+      </div>
+    </div>
+    <p class="hint">
+      This image carousel uses the <code>simple-slider</code> JavaScript library.
+    </p>
+  </section>
+
   <h1>Weather → Outfit Planner</h1>
   <p class="hint">
-    Use your location (or manual coordinates) to fetch current weather from Open-Meteo,
-    then get outfit recommendations tuned to the temperature and your context.
+    Use your location (or manual coordinates) to fetch current weather from Open-Meteo.
+    The planner turns that into a simple outfit recommendation and exposes the exact API
+    request you can reuse in Insomnia.
   </p>
 
   <!-- 1. Location + context -->
@@ -295,8 +348,9 @@
       <div>Wind</div><div id="wind">—</div>
     </div>
 
-    <!-- Temperature chart -->
-    <canvas id="tempChart" height="120" style="margin-top:12px;"></canvas>
+    <!-- Small temperature trend chart using Chart.js -->
+    <canvas id="tempChart"></canvas>
+    <p class="hint">Mini temperature trend (next few hours, °F).</p>
 
     <hr class="subtle-divider" />
     <h2>3) Outfit Recommendation</h2>
@@ -315,12 +369,12 @@
     <!-- Supabase outfit rules -->
     <hr class="subtle-divider" />
     <h2>4) Rule-Based Suggestions (from DB)</h2>
-    <div id="outfitSlider" class="siema"></div>
+    <p class="hint">
+      These cards come from your Supabase <code>outfit_rules</code> table,
+      filtered by temperature and outfit context.
+    </p>
+    <div id="outfitList" class="outfit-list"></div>
     <p id="outfitError" class="danger-text" style="display:none;"></p>
-    <div class="slider-controls" id="sliderControls" style="display:none;">
-      <button class="slider-btn" id="prevSlide">Prev</button>
-      <button class="slider-btn" id="nextSlide">Next</button>
-    </div>
 
     <div style="margin-top:10px;">
       <button id="btnSave" class="secondary">⭐ Save this outfit combo</button>
@@ -340,14 +394,18 @@
   </div>
 </main>
 
-<!-- Siema slider (JS library #2) -->
-<script src="https://cdn.jsdelivr.net/npm/siema@1.5.1/dist/siema.min.js"></script>
+<!-- JS libraries -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/simple-slider/0.1.0/simpleslider.min.js"></script>
 
 <script>
   const $ = s => document.querySelector(s);
 
   const toF = c => Math.round(c * 9/5 + 32);
   const toMPH = kph => Math.round(kph * 0.621371);
+
+  let tempChart = null;
+  let lastTempF = null;   // for reloading DB rules when context changes
 
   function outfitForTemp(f){
     if(f < 40) return '🥶 Heavy coat, scarf, warm pants & boots';
@@ -369,7 +427,52 @@
     label.textContent = text;
   }
 
-  // Weather + reverse geocode
+  function renderTempChart(times, temps){
+    const canvas = document.getElementById('tempChart');
+    if(!canvas || typeof Chart === 'undefined') return;
+
+    const ctx = canvas.getContext('2d');
+    const labels = times.map(t => {
+      const d = new Date(t);
+      return d.toLocaleTimeString([], {hour:'numeric'});
+    });
+    const dataF = temps.map(toF);
+
+    if(tempChart){
+      tempChart.destroy();
+    }
+
+    tempChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Temperature (°F)',
+          data: dataF,
+          tension: 0.3,
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display:false }
+        },
+        scales: {
+          x: {
+            ticks: { color:'#9ca3af', font:{size:11} },
+            grid: { display:false }
+          },
+          y: {
+            ticks: { color:'#9ca3af', font:{size:11} },
+            grid: { color:'rgba(148,163,184,.2)' }
+          }
+        }
+      }
+    });
+  }
+
+  // DIRECT Open-Meteo call
   async function fetchWeather(lat, lon){
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'America/New_York';
     const url = new URL('https://api.open-meteo.com/v1/forecast');
@@ -380,11 +483,12 @@
 
     const res = await fetch(url.toString(), { cache:'no-store', mode:'cors' });
     if(!res.ok){
-      const text = await res.text().catch(()=> '');
+      const text = await res.text().catch(() => '');
       throw new Error(`Forecast HTTP ${res.status} ${res.statusText} ${text}`);
     }
     const raw = await res.json();
 
+    // optional reverse geocode
     let place = `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
     try{
       const rUrl = new URL('https://geocoding-api.open-meteo.com/v1/reverse');
@@ -410,7 +514,6 @@
     };
   }
 
-  // DB rules API
   async function fetchOutfitRules(tempF, context){
     const params = new URLSearchParams({ temp: tempF, context });
     const url = `/api/outfits?${params.toString()}`;
@@ -422,49 +525,39 @@
     return res.json();
   }
 
-  // Save outfit API
   async function saveCurrentOutfit(state){
-    const res = await fetch('/api/saved-outfits', {
+    const url = '/api/saved-outfits';
+    const res = await fetch(url, {
       method:'POST',
       headers:{ 'Content-Type':'application/json' },
       body:JSON.stringify(state)
     });
     if(!res.ok){
-      const text = await res.text().catch(()=> '');
+      const text = await res.text().catch(() => '');
       throw new Error(`Save API HTTP ${res.status} ${res.statusText} ${text}`);
     }
     return res.json();
   }
 
-  // Render DB rules into Siema slider
   function renderOutfitRules(list){
-    const container = $('#outfitSlider');
+    const container = $('#outfitList');
     const errEl = $('#outfitError');
-    const controls = $('#sliderControls');
-
     container.innerHTML = '';
     errEl.style.display = 'none';
     errEl.textContent = '';
-    controls.style.display = 'none';
-
-    // destroy prior slider instance if exists
-    if(window.outfitSliderInstance){
-      window.outfitSliderInstance.destroy(true);
-      window.outfitSliderInstance = null;
-    }
 
     if(!Array.isArray(list) || list.length === 0){
       const msg = document.createElement('p');
       msg.className = 'hint';
       msg.textContent =
-        'No DB rules matched this weather + context yet. You can add some rules in your Supabase table later.';
+        'No DB rules matched this weather + context yet. Add more rules in your Supabase table.';
       container.appendChild(msg);
       return;
     }
 
     list.forEach((rule, idx) => {
-      const slide = document.createElement('div');
-      slide.className = 'outfit-card';
+      const card = document.createElement('div');
+      card.className = 'outfit-card';
 
       const main = document.createElement('div');
       main.className = 'outfit-card-main';
@@ -479,7 +572,9 @@
       if(rule.context){
         parts.push(`Context: ${rule.context}`);
       }
-      meta.textContent = parts.join(' • ');
+      if(parts.length){
+        meta.textContent = parts.join(' • ');
+      }
 
       const tagsWrap = document.createElement('div');
       if(rule.tags && Array.isArray(rule.tags)){
@@ -491,24 +586,12 @@
         });
       }
 
-      slide.appendChild(main);
-      if(meta.textContent) slide.appendChild(meta);
-      if(tagsWrap.childNodes.length) slide.appendChild(tagsWrap);
+      card.appendChild(main);
+      if(meta.textContent) card.appendChild(meta);
+      if(tagsWrap.childNodes.length) card.appendChild(tagsWrap);
 
-      container.appendChild(slide);
+      container.appendChild(card);
     });
-
-    // init slider
-    window.outfitSliderInstance = new Siema({
-      selector: '#outfitSlider',
-      duration: 300,
-      loop: true,
-      perPage: 1
-    });
-
-    if(list.length > 1){
-      controls.style.display = 'flex';
-    }
   }
 
   async function run(lat, lon){
@@ -545,6 +628,8 @@
       if(idx === -1) idx = 0;
 
       const tempF = toF(temps[idx]);
+      lastTempF = tempF; // save for later context changes
+
       const hum = hums[idx];
       const wind = toMPH(winds[idx]);
 
@@ -557,14 +642,17 @@
       const place = data.place || `${lat.toFixed(3)}, ${lon.toFixed(3)}`;
       $('#place').textContent = place;
 
-      const ctx = $('#contextSelect').value;
-
       const mainAdvice = outfitForTemp(tempF);
+      const ctx = $('#contextSelect').value;
       $('#advice').textContent = mainAdvice;
       $('#adviceDetail').textContent =
         `Based on ~${tempF}°F right now. Context: ${ctx}.`;
 
-      // Open-Meteo curl + JSON excerpt
+      // Chart.js mini trend (next few hours)
+      const sliceCount = 8;
+      renderTempChart(times.slice(idx, idx + sliceCount), temps.slice(idx, idx + sliceCount));
+
+      // Show the Open-Meteo URL + JSON excerpt for Insomnia
       const upstream = data.forecastUrl || '(forecast URL not available)';
       $('#curl').textContent = `GET ${upstream}`;
       $('#json').textContent = JSON.stringify({
@@ -580,58 +668,18 @@
       }, null, 2);
       debugCard.style.display = '';
 
-      // Save last weather so context changes can reuse it
-      window.__lastWeatherState = {
-        tempF,
-        place,
-        observed_at: new Date(times[idx]).toISOString()
-      };
-
-      // Temperature chart using Chart.js
-      const chartCanvas = document.getElementById('tempChart');
-      const chartTemps = temps.slice(idx, idx + 12).map(c => toF(c));
-      const chartLabels = times.slice(idx, idx + 12).map(t =>
-        new Date(t).toLocaleTimeString([], { hour: 'numeric' })
-      );
-
-      if(window.tempChartInstance){
-        window.tempChartInstance.destroy();
-      }
-      window.tempChartInstance = new Chart(chartCanvas, {
-        type: 'line',
-        data: {
-          labels: chartLabels,
-          datasets: [{
-            label: 'Temperature (°F)',
-            data: chartTemps,
-            borderColor: '#60a5fa',
-            backgroundColor: 'rgba(96,165,250,0.2)',
-            tension: 0.3
-          }]
-        },
-        options: {
-          plugins: { legend: { display:false } },
-          scales: {
-            x: { ticks: { color:'#94a3b8' } },
-            y: { ticks: { color:'#94a3b8' } }
-          }
-        }
-      });
-
-      // Load DB rules
+      // DB outfit rules
       try{
         setStatus('Loading DB outfit rules…');
         const rules = await fetchOutfitRules(tempF, ctx);
         renderOutfitRules(rules);
       }catch(innerErr){
-        console.warn('Outfit rules fetch failed:', innerErr);
+        console.error('Outfit rules fetch failed:', innerErr);
         const errEl = $('#outfitError');
         errEl.style.display = '';
-        errEl.textContent =
-          'Could not load DB outfit rules. Check /api/outfits & Supabase.';
+        errEl.textContent = 'Could not load DB outfit rules. Check /api/outfits and Supabase config.';
       }
 
-      // Save state for POST /api/saved-outfits
       const saveState = {
         place,
         temp_f: tempF,
@@ -684,12 +732,33 @@
     }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
   });
 
-  // Save current outfit via /api/saved-outfits
+  // Change context without re-fetching weather: reuse lastTempF
+  $('#contextSelect').addEventListener('change', async () => {
+    if(!Number.isFinite(lastTempF)){
+      // No weather yet, nothing to filter
+      return;
+    }
+    const ctx = $('#contextSelect').value;
+    try{
+      setStatus('Updating outfits…');
+      const rules = await fetchOutfitRules(lastTempF, ctx);
+      renderOutfitRules(rules);
+      $('#adviceDetail').textContent =
+        `Based on ~${lastTempF}°F right now. Context: ${ctx}.`;
+      setStatus('Ready');
+    }catch(e){
+      console.error(e);
+      const errEl = $('#outfitError');
+      errEl.style.display = '';
+      errEl.textContent = 'Could not update DB outfit rules for this context.';
+      setStatus('Error');
+    }
+  });
+
   $('#btnSave').addEventListener('click', async () => {
     const btn = $('#btnSave');
     const status = $('#saveStatus');
     const stateStr = btn.dataset.state;
-
     if(!stateStr){
       status.textContent = 'No outfit to save yet. Fetch weather first.';
       return;
@@ -706,49 +775,25 @@
     status.textContent = 'Saving…';
     try{
       await saveCurrentOutfit(state);
-      status.textContent = 'Saved!';
+      status.textContent = 'Saved to Supabase!';
     }catch(e){
       console.error(e);
-      status.textContent = 'Save failed.';
+      status.textContent = 'Save failed. Check /api/saved-outfits.';
     }finally{
       btn.disabled = false;
       setTimeout(() => { status.textContent = ''; }, 4000);
     }
   });
 
-  // Auto-update DB rules when context changes
-  $('#contextSelect').addEventListener('change', async () => {
-    const state = window.__lastWeatherState;
-    if(!state) return; // no weather yet
-
-    const tempF = state.tempF;
-    const ctx = $('#contextSelect').value;
-
-    setStatus('Updating rules…');
-    try{
-      const rules = await fetchOutfitRules(tempF, ctx);
-      renderOutfitRules(rules);
-      $('#adviceDetail').textContent =
-        `Based on ~${tempF}°F right now. Context: ${ctx}.`;
-    }catch(err){
-      console.warn('Context update failed:', err);
-      const errEl = $('#outfitError');
-      errEl.style.display = '';
-      errEl.textContent =
-        'Could not load DB outfit rules for the new context.';
-    }
-    setStatus('Ready');
-  });
-
-  // Slider controls
-  $('#prevSlide').addEventListener('click', () => {
-    if(window.outfitSliderInstance){
-      window.outfitSliderInstance.prev();
-    }
-  });
-  $('#nextSlide').addEventListener('click', () => {
-    if(window.outfitSliderInstance){
-      window.outfitSliderInstance.next();
+  // Initialize image slider once DOM is ready
+  document.addEventListener('DOMContentLoaded', () => {
+    const sliderEl = document.getElementById('weatherSlider');
+    if(window.simpleslider && sliderEl){
+      simpleslider.getSlider({
+        container: sliderEl,
+        transitionDuration: 0.6,
+        delay: 3500
+      });
     }
   });
 </script>
