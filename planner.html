@@ -381,7 +381,7 @@ async function run(lat, lon){
 
     const ctx = $("#contextSelect").value;
     $("#advice").textContent = outfitForTemp(lastTempF);
-    $("#adviceDetail").textContent = `Based on ${lastTempF}°F and context: ${ctx}`;
+    $("#adviceDetail").textContent = `Based on ${lastTempF}°F`;
 
     const rules = await loadOutfitRules(lastTempF, ctx);
     renderOutfitRules(rules);
