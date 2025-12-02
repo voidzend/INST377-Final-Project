@@ -1,19 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Saved Outfits</title>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #333;
+      color: #fff;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .outfit-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      padding: 20px;
+    }
+
+    .outfit-card {
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 15px;
+      width: 260px;
+      background: #f9f9f9;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .outfit-card p {
+      margin: 5px 0;
+    }
+
+    #errorMsg {
+      text-align: center;
+      color: red;
+      margin-top: 2rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>Saved Outfits</h1>
+  <header>
+    <h1>Saved Outfits</h1>
+    <a href="planner.html">← Back to Planner</a>
+  </header>
+
   <div id="savedOutfitsContainer" class="outfit-grid"></div>
+  <div id="errorMsg"></div>
 
   <script type="module">
     async function fetchSavedOutfits() {
       try {
         const response = await fetch('/api/saved-outfits');
+        if (!response.ok) throw new Error('Server responded with an error');
+
         const data = await response.json();
 
         const container = document.getElementById('savedOutfitsContainer');
@@ -38,43 +98,13 @@
           container.appendChild(card);
         });
       } catch (err) {
-        console.error('Failed to fetch saved outfits:', err);
-        document.getElementById('savedOutfitsContainer').innerHTML = '<p>Error loading saved outfits.</p>';
+        console.error(err);
+        document.getElementById('errorMsg').textContent = 'Error loading saved outfits.';
       }
     }
 
     fetchSavedOutfits();
   </script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
-    .outfit-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-    }
-
-    .outfit-card {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 15px;
-      width: 250px;
-      background: #f9f9f9;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .outfit-card p {
-      margin: 5px 0;
-    }
-  </style>
 </body>
 </html>
+
