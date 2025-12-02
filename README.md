@@ -16,7 +16,9 @@ Description of target browsers (iOS? Android? Which ones?):
 Bullet list of browsers you tested and support.
 Tested and support IOS 18.6.2, and  Windows.
 
-[Live Demo / Deployment Link (Vercel)](https://vercel.com/duran-keefes-projects/inst-377-final-project/J6k39eRoJLvvu6UoJQfmekSPfvpS)
+[Vercel Live Demo Link](https://inst-377-final-project-psi.vercel.app/)
+[Vercel Deployment Link](https://vercel.com/duran-keefes-projects/inst-377-final-project/J6k39eRoJLvvu6UoJQfmekSPfvpS)
+
 
 Link to Developer Manual
 
