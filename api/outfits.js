@@ -1,9 +1,10 @@
-// api/outfits.js (Vercel ESM route)
+// api/outfits.js  (Vercel ESM handler)
 import { supabase } from '../lib/supabaseClient.js';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
+
     const temp = searchParams.get("temp");
     const context = searchParams.get("context") || "casual";
 
@@ -17,7 +18,7 @@ export async function GET(request) {
       );
     }
 
-    // Build the Supabase query
+    // Build Supabase query
     let query = supabase
       .from("outfit_rules")
       .select("*")
@@ -48,6 +49,10 @@ export async function GET(request) {
     return new Response(
       JSON.stringify({ error: "Server error", detail: String(err) }),
       { status: 500 }
+    );
+  }
+}
+
     );
   }
 }
