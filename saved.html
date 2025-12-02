@@ -1,104 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
+  <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Saved Outfits</title>
-  <link rel="stylesheet" href="style.css"/>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
-
-    header {
-      background-color: #333;
-      color: #fff;
-      padding: 10px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header h1 {
-      margin: 0;
-    }
-
-    header a {
-      color: #fff;
-      text-decoration: none;
-      font-weight: bold;
-    }
-
-    .outfit-grid {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1rem;
-      padding: 20px;
-    }
-
-    .outfit-card {
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      padding: 15px;
-      width: 260px;
-      background: #f9f9f9;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .outfit-card p {
-      margin: 5px 0;
-    }
-
-    #errorMsg {
-      text-align: center;
-      color: red;
-      margin-top: 2rem;
-    }
+    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    header { background-color: #333; color: white; padding: 16px; font-size: 24px; }
+    .outfit-card { background: #f4f4f4; margin: 12px; padding: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .outfit-grid { display: flex; flex-wrap: wrap; padding: 12px; }
+    .back-link { color: white; text-decoration: none; float: right; font-size: 16px; }
   </style>
 </head>
 <body>
   <header>
-    <h1>Saved Outfits</h1>
-    <a href="planner.html">← Back to Planner</a>
+    Saved Outfits
+    <a class="back-link" href="planner.html">← Back to Planner</a>
   </header>
 
+  <div id="errorMsg" style="padding: 12px; color: red;"></div>
   <div id="savedOutfitsContainer" class="outfit-grid"></div>
-  <div id="errorMsg"></div>
 
-  <script type="module">
+  <script>
+    const supabaseUrl = 'https://YOUR_PROJECT_ID.supabase.co';
+    const supabaseKey = 'YOUR_ANON_KEY';
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
     async function fetchSavedOutfits() {
       try {
-        const response = await fetch('/api/saved-outfits');
-        if (!response.ok) throw new Error('Server responded with an error');
-
-        const data = await response.json();
+        const { data, error } = await supabase
+          .from('saved_outfits')
+          .select('*')
+          .order('created_at', { ascending: false });
 
         const container = document.getElementById('savedOutfitsContainer');
+        const errorDiv = document.getElementById('errorMsg');
         container.innerHTML = '';
+        errorDiv.textContent = '';
 
-        if (!Array.isArray(data) || data.length === 0) {
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
           container.innerHTML = '<p>No saved outfits found.</p>';
           return;
         }
 
-        data.forEach((item) => {
+        data.forEach(item => {
           const card = document.createElement('div');
           card.className = 'outfit-card';
-
           card.innerHTML = `
             <p><strong>📍 Location:</strong> ${item.place}</p>
-            <p><strong>🌡️ Temperature:</strong> ${item.temp_f}°F</p>
-            <p><strong>🎯 Context:</strong> ${item.context}</p>
-            <p><strong>🧥 Advice:</strong> ${item.advice}</p>
+            <p><strong>🌡️ Temperature:</strong> ${item.temp}°F</p>
+            <p><strong>🧠 Context:</strong> ${item.context}</p>
+            <p><strong>👕 Advice:</strong> ${item.advice}</p>
           `;
-
           container.appendChild(card);
         });
+
       } catch (err) {
-        console.error(err);
+        console.error('Error loading outfits:', err);
         document.getElementById('errorMsg').textContent = 'Error loading saved outfits.';
       }
     }
@@ -107,4 +69,3 @@
   </script>
 </body>
 </html>
-
