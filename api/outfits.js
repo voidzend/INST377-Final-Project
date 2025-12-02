@@ -9,7 +9,7 @@ export async function GET(request) {
     const context = searchParams.get("context") || "casual";
 
     const tempF = parseInt(temp, 10);
-    const ctx = context.toLowerCase();
+    const ctx = context.toLowerCase().trim();
 
     if (!Number.isFinite(tempF)) {
       return new Response(
@@ -18,16 +18,13 @@ export async function GET(request) {
       );
     }
 
-    // Query Supabase for rules
+    // Build Supabase query: min_temp <= temp <= max_temp AND context matches
     let query = supabase
       .from("outfit_rules")
       .select("*")
       .lte("min_temp", tempF)
-      .gte("max_temp", tempF);
-
-    if (ctx !== "casual") {
-      query = query.eq("context", ctx);
-    }
+      .gte("max_temp", tempF)
+      .eq("context", ctx);   // << ALWAYS filter context
 
     const { data, error } = await query;
 
