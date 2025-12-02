@@ -1,5 +1,5 @@
-// api/outfits.js  (Vercel ESM handler)
-import { supabase } from '../lib/supabaseClient.js';
+// api/outfits.js (Vercel ESM handler)
+import { supabase } from "../lib/supabaseClient.js";
 
 export async function GET(request) {
   try {
@@ -18,21 +18,21 @@ export async function GET(request) {
       );
     }
 
-    // Build Supabase query
+    // Query Supabase for rules
     let query = supabase
       .from("outfit_rules")
       .select("*")
       .lte("min_temp", tempF)
       .gte("max_temp", tempF);
 
-    if (ctx && ctx !== "casual") {
+    if (ctx !== "casual") {
       query = query.eq("context", ctx);
     }
 
     const { data, error } = await query;
 
     if (error) {
-      console.error("Supabase error in /api/outfits:", error);
+      console.error("Supabase error:", error);
       return new Response(
         JSON.stringify({ error: "Database error", detail: error.message }),
         { status: 500 }
@@ -41,19 +41,14 @@ export async function GET(request) {
 
     return new Response(JSON.stringify(data || []), {
       status: 200,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     });
 
   } catch (err) {
-    console.error("Unexpected error in /api/outfits:", err);
+    console.error("Unexpected error:", err);
     return new Response(
       JSON.stringify({ error: "Server error", detail: String(err) }),
       { status: 500 }
     );
   }
 }
-
-    );
-  }
-}
-
