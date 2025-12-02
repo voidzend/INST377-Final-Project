@@ -1,48 +1,52 @@
-// api/saved-outfits.js
-import { supabase } from '../lib/supabaseClient.js';
+// api/saved-outfits.js (Vercel ESM API Route)
+import { supabase } from "../lib/supabaseClient.js";
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+export async function POST(request) {
   try {
-    const body = req.body || {};
+    const body = await request.json();
 
-    const place = body.place || null;
-    const tempF = body.temp_f;
-    const context = body.context;
-    const advice = body.advice;
-    const observedAt = body.observed_at || null;
+    const { place, temp_f, context, advice, observed_at } = body;
 
-    if (!Number.isFinite(tempF) || !context || !advice) {
-      return res.status(400).json({
-        error: 'Missing required fields',
-        detail: 'temp_f (number), context (string), advice (string) are required'
-      });
+    if (!place || !temp_f || !context || !advice || !observed_at) {
+      return new Response(
+        JSON.stringify({ error: "Missing required fields" }),
+        { status: 400 }
+      );
     }
 
     const { data, error } = await supabase
-      .from('saved_outfits')
-      .insert({
-        place,
-        temp_f: tempF,
-        context,
-        advice,
-        observed_at: observedAt
-      })
-      .select()
-      .single();
+      .from("saved_outfits")
+      .insert([
+        {
+          place,
+          temp_f,
+          context,
+          advice,
+          observed_at,
+          created_at: new Date().toISOString()
+        }
+      ])
+      .select();
 
     if (error) {
-      console.error('Supabase error in /api/saved-outfits:', error);
-      return res.status(500).json({ error: 'Database error', detail: error.message });
+      console.error("Supabase error in /api/saved-outfits:", error);
+      return new Response(
+        JSON.stringify({ error: "Database insert failed", detail: error.message }),
+        { status: 500 }
+      );
     }
 
-    return res.status(201).json({ success: true, saved: data });
+    return new Response(JSON.stringify({ success: true, data }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+
   } catch (err) {
-    console.error('Unexpected error in /api/saved-outfits:', err);
-    return res.status(500).json({ error: 'Server error', detail: String(err) });
+    console.error("Unexpected error in /api/saved-outfits:", err);
+    return new Response(
+      JSON.stringify({ error: "Server error", detail: String(err) }),
+      { status: 500 }
+    );
   }
 }
+
