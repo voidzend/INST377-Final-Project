@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
+  "main": "index.js",
   "dependencies": {
     "@supabase/supabase-js": "^2.48.0"
   }
