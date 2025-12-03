@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Climate Closet – About</title>
+  <title>Climate Closet – Saved Outfits</title>
   <style>
     :root{
       --bg:#0f172a;
@@ -61,31 +61,29 @@
       margin:24px 0 8px;
       font-size:28px;
     }
-    h2{
-      margin-top:22px;
-      font-size:18px;
-    }
     p{
       color:var(--muted);
       font-size:14px;
       line-height:1.5;
       max-width:720px;
     }
-    ul{
-      color:var(--muted);
-      font-size:14px;
+    .outfit-card {
+      background-color: var(--panel);
+      border: 1px solid rgba(148,163,184,.2);
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 16px;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      padding:4px 10px;
-      border-radius:999px;
-      border:1px solid rgba(148,163,184,.4);
-      font-size:12px;
-      color:var(--muted);
-      margin-top:4px;
+    .outfit-card h2 {
+      font-size: 18px;
+      margin: 0 0 8px;
+    }
+    .outfit-card p {
+      margin: 4px 0;
     }
   </style>
+  <!-- Supabase JS client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/+esm" type="module"></script>
 </head>
 <body>
 <header>
@@ -102,9 +100,55 @@
 
 <main class="wrap">
   <h1>Saved Outfits</h1>
-  <p>
-    If you pressed saved while viewing any outfits while on the outfit planner page those saved outfits should appear here. 
-  </p>
+  <p>If you pressed save while viewing any outfits on the planner page, those outfits will appear here.</p>
+  
+  <div id="outfits-container">
+    <p>Loading saved outfits...</p>
+  </div>
 </main>
+
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.5/+esm";
+
+  const supabaseUrl = 'https://mmhqtojveavevrwfptzk.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1taHF0b2p2ZWF2ZXZyd2ZwdHprIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwODQxNTgsImV4cCI6MjA3OTY2MDE1OH0.NHzokqO15zt-W5EcJHj-JMhzcGADcv0bwlOEaDQuEW0';
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  const container = document.getElementById('outfits-container');
+  container.innerHTML = '<p>Loading saved outfits...</p>';
+
+  async function loadSavedOutfits() {
+    const { data, error } = await supabase
+      .from('saved_outfits')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) {
+      container.innerHTML = `<p style="color: red;">Error loading saved outfits: ${error.message}</p>`;
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      container.innerHTML = `<p>No outfits saved yet. Try saving one from the planner page!</p>`;
+      return;
+    }
+
+    container.innerHTML = ''; // Clear loading message
+
+    data.forEach(({ place, temp_f, context, advice }) => {
+      const card = document.createElement('div');
+      card.className = 'outfit-card';
+      card.innerHTML = `
+        <h2>${place} – ${temp_f}°F</h2>
+        <p><strong>Context:</strong> ${context || 'N/A'}</p>
+        <p><strong>Advice:</strong> ${advice || 'No advice provided.'}</p>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  loadSavedOutfits();
+</script>
 </body>
 </html>
+
