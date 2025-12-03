@@ -1,71 +1,110 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Saved Outfits</title>
-  <link rel="stylesheet" href="style.css" />
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Climate Closet – About</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
-    header { background-color: #333; color: white; padding: 16px; font-size: 24px; }
-    .outfit-card { background: #f4f4f4; margin: 12px; padding: 16px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .outfit-grid { display: flex; flex-wrap: wrap; padding: 12px; }
-    .back-link { color: white; text-decoration: none; float: right; font-size: 16px; }
+    :root{
+      --bg:#0f172a;
+      --panel:#111827;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --accent:#22c55e;
+      --accent2:#60a5fa;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:system-ui,Segoe UI,Roboto,Inter,Arial;
+      background:var(--bg);
+      color:var(--text);
+    }
+    a{color:inherit;text-decoration:none}
+    .wrap{
+      max-width:920px;
+      margin:0 auto;
+      padding:0 16px 48px;
+    }
+    header{
+      border-bottom:1px solid rgba(148,163,184,.25);
+      background:#020617;
+    }
+    .nav{
+      max-width:920px;
+      margin:0 auto;
+      padding:12px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .nav-title{
+      font-weight:700;
+      font-size:18px;
+    }
+    .nav-links{
+      display:flex;
+      gap:10px;
+      font-size:14px;
+    }
+    .nav-links a{
+      padding:6px 10px;
+      border-radius:999px;
+      color:var(--muted);
+    }
+    .nav-links a.active{
+      background:rgba(96,165,250,.2);
+      color:#e5f0ff;
+    }
+    h1{
+      margin:24px 0 8px;
+      font-size:28px;
+    }
+    h2{
+      margin-top:22px;
+      font-size:18px;
+    }
+    p{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.5;
+      max-width:720px;
+    }
+    ul{
+      color:var(--muted);
+      font-size:14px;
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(148,163,184,.4);
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
   </style>
 </head>
 <body>
-  <header>
-    Saved Outfits
-    <a class="back-link" href="planner.html">← Back to Planner</a>
-  </header>
+<header>
+  <div class="nav">
+    <div class="nav-title">Climate Closet</div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="planner.html">Outfit planner</a>
+      <a href="saved.html" class="active">Saved Outfits</a>
+      <a href="about.html">About</a>
+    </nav>
+  </div>
+</header>
 
-  <div id="errorMsg" style="padding: 12px; color: red;"></div>
-  <div id="savedOutfitsContainer" class="outfit-grid"></div>
-
-  <script>
-    const supabaseUrl = 'https://YOUR_PROJECT_ID.supabase.co';
-    const supabaseKey = 'YOUR_ANON_KEY';
-    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-    async function fetchSavedOutfits() {
-      try {
-        const { data, error } = await supabase
-          .from('saved_outfits')
-          .select('*')
-          .order('created_at', { ascending: false });
-
-        const container = document.getElementById('savedOutfitsContainer');
-        const errorDiv = document.getElementById('errorMsg');
-        container.innerHTML = '';
-        errorDiv.textContent = '';
-
-        if (error) throw error;
-
-        if (!data || data.length === 0) {
-          container.innerHTML = '<p>No saved outfits found.</p>';
-          return;
-        }
-
-        data.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'outfit-card';
-          card.innerHTML = `
-            <p><strong>📍 Location:</strong> ${item.place}</p>
-            <p><strong>🌡️ Temperature:</strong> ${item.temp}°F</p>
-            <p><strong>🧠 Context:</strong> ${item.context}</p>
-            <p><strong>👕 Advice:</strong> ${item.advice}</p>
-          `;
-          container.appendChild(card);
-        });
-
-      } catch (err) {
-        console.error('Error loading outfits:', err);
-        document.getElementById('errorMsg').textContent = 'Error loading saved outfits.';
-      }
-    }
-
-    fetchSavedOutfits();
-  </script>
+<main class="wrap">
+  <h1>Saved Outfits</h1>
+  <p>
+    If you pressed saved while viewing any outfits while on the outfit planner page those saved outfits should appear here. 
+  </p>
+</main>
 </body>
 </html>
