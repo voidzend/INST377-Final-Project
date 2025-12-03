@@ -1,24 +1,33 @@
-// /api/saved-outfits.js
-import { createClient } from '@supabase/supabase-js'
+// api/saved-outfits.js
+import { supabase } from '../lib/supabaseClient.js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-)
-
-export default async function handler(req, res) {
+export async function POST(request) {
   try {
+    const body = await request.json();
+    const { place, temp_f, context, advice, observed_at } = body;
+
     const { data, error } = await supabase
       .from('saved_outfits')
-      .select('*')
-      .order('created_at', { ascending: false })
+      .insert([{ place, temp_f, context, advice, observed_at }]);
 
-    if (error) throw error
+    if (error) {
+      console.error("Insert error:", error);
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" }
+      });
+    }
 
-    res.status(200).json(data)
+    return new Response(JSON.stringify({ success: true, data }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" }
+    });
+
   } catch (err) {
-    console.error('Error fetching saved outfits:', err.message)
-    res.status(500).json({ error: 'Failed to fetch saved outfits' })
+    console.error("Unexpected server error:", err);
+    return new Response(JSON.stringify({ error: "Unexpected server error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" }
+    });
   }
 }
-
