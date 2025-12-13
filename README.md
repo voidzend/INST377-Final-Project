@@ -19,7 +19,7 @@ faster/more convient, and less stressful by using real, up to date weather data 
 
 
 Target browsers:
-Tested and support IOS 18.6.2, and  Windows.
+Tested and support IOS 18.6.2, Android Version 16, and  Windows.
 
 [Vercel Live Demo Link](https://inst-377-final-project-psi.vercel.app/)
 [Vercel Deployment Link](https://vercel.com/duran-keefes-projects/inst-377-final-project/J6k39eRoJLvvu6UoJQfmekSPfvpS)
