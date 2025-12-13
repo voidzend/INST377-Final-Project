@@ -18,7 +18,7 @@ or a jacket. It also includes simple charts that help users see how the weather 
 faster/more convient, and less stressful by using real, up to date weather data instead of guesswork.
 
 
-Description of target browsers (iOS? Android? Which ones?):
+Target browsers:
 Tested and support IOS 18.6.2, and  Windows.
 
 [Vercel Live Demo Link](https://inst-377-final-project-psi.vercel.app/)
