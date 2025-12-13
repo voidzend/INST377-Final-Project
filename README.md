@@ -7,19 +7,18 @@ Title of your project: Climate Closet
 # Climate Closet: Weather-Based Outfit Recommender
 
 Description of your project: 
-Climate Closet solves a simple everyday problem: this probelm includes standing in front of your closet
-and not knowing what to wear due to the fact that you're unsure or uncertain about what the weather may hold for you. A lot of indivduals check the weather,
-but will still will not know or have certaintaty how that should translate over to an actual outfit. Instead of guessing or flipping a coin or even overdressing, this app
-makes sure to check and scan for the current weather for your location and turns that information into a clear clothing suggestion that makes sense for the temperature, wind, and overall conditions outside.
+Climate Closet solves a simple everyday problem: this probelm is standing in front of your closet
+and not knowing what to wear due to the fact that you're unsure or uncertain about what the weather may hold for the day. A lot of indivduals check the weather,
+but will still will not know or have uncertaintaty about how that should translate over to an actual outfit. Instead of guessing or flipping a coin or even overdressing, this app
+makes sure to check and scan for the current weather for your location and turns that information into a clear clothing suggestion that makes sense for the temperature outside.
 
-Our app will display and showcase a quick weather snapshot that includes the current temperature, humidity, precipitation chance, and even wind speed so that way
+Our app displays and showcases a quick weather snapshot that includes the current temperature, humidity, precipitation chance, and even wind speed so that way
 users can see exactly what's going on outside. Based and due to the data, the Climate Closet recommends what type of clothing to wear, such as a light shirt, long sleeves,
 or a jacket. It also includes simple charts that help users see how the weather changes over time. Overall, the ultimate endgame for this application is to make getting dressed easier,
 faster/more convient, and less stressful by using real, up to date weather data instead of guesswork.
 
 
 Description of target browsers (iOS? Android? Which ones?):
-Bullet list of browsers you tested and support.
 Tested and support IOS 18.6.2, and  Windows.
 
 [Vercel Live Demo Link](https://inst-377-final-project-psi.vercel.app/)
