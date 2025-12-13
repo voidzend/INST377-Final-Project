@@ -5,6 +5,44 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Climate Closet – Saved Outfits</title>
   <style>
+  /*ANIMATION*/
+    body {
+      amimation: fadeIn 0.4s ease in;
+    }
+
+    /*Fade in section smoothly */
+    .fade-in {
+      animation: fadeIN 0.6s ease forwards;
+    }
+    /* Slide-up animation for outfit cards */
+    .slide-up {
+      animation: slideUp 0.5s ease-out forwards;
+    }
+
+    /* Fade Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: TranslateY(6px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    /*Slide-up animation*/
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    
     :root{
       --bg:#0f172a;
       --panel:#111827;
@@ -98,7 +136,7 @@
   </div>
 </header>
 
-<main class="wrap">
+<main class="wrap fade-in">
   <h1>Saved Outfits</h1>
   <p>If you pressed save while viewing any outfits on the planner page, those outfits will appear here.</p>
   
@@ -137,7 +175,7 @@
 
     data.forEach(({ place, temp_f, context, advice }) => {
       const card = document.createElement('div');
-      card.className = 'outfit-card';
+      card.className = 'outfit-card slide-up';
       card.innerHTML = `
         <h2>${place} – ${temp_f}°F</h2>
         <p><strong>Context:</strong> ${context || 'N/A'}</p>
