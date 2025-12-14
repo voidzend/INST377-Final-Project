@@ -27,7 +27,7 @@ Tested and support IOS 18.6.2, Android Version 16, and  Windows.
 
 Link to Developer Manual
 
-# Developer Manual (bottom half of your README.md): docs.google.com/document/d/1sKUK37qm-d26ypvaubSLJ3e10gmbVXwpSomVtF27Arc
+# Developer Manual: docs.google.com/document/d/1sKUK37qm-d26ypvaubSLJ3e10gmbVXwpSomVtF27Arc
 
 Climate Closet - Developer Manual
 Project: Climate Closet
