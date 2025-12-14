@@ -50,9 +50,6 @@ The Backend/API routes (Vercel serverless functions)
 The Database (Supabase/PostgreSQL)
 
 
-
-
-
 System Infrastructure (High Level)
 The Frontend:
 index.html - Home Page
@@ -66,8 +63,6 @@ Externals and Outside Services:
 Open-Meteo API (weather data)
 Supabase (PostgreSQL database)
 Vercel (hosting + serverless APIs)
-
-
 
 
 Installation Setup (Local Development)
@@ -147,15 +142,19 @@ What happens: Inserts a new row into the saved_outfits table and returns success
 Database Tables
 outfit_rules: Used for rule-based outfit suggestions
 
-Typical fields:
-Min_temp
-Max_temp
+Fields:
+id
+min_temp
+max_temp
 Context
 Description
+tags
 
 saved_outfits: Stores outfits that are saved by users.
 
-Typical Fields:
+Fields:
+id
+created_at
 place
 temp_f
 context
@@ -178,12 +177,6 @@ Frontend unit tests
 
 
 
-
-
-
-
-
-
 Bugs & Limitations
 Big web pages and applications can end up having numerous amounts of bugs and errors that cut off the performance of the page.
 Our bugs include:
@@ -193,9 +186,6 @@ Saved outfit page uses a public Supabase anon key
 Deleting saved outfits requires going into the supabase saved_outfits table and manually deleting rows.
 No edit feature for the saved outfits
 No error UI beyond alerts
-
-
-
 
 
 Future Improvements
